@@ -1,5 +1,5 @@
 ﻿/**************************************************************************************************
-** This sample demonstrates how to grab images and disparity map with the Evo SDK                **
+** This sample demonstrates how to grab images and disparity map with the EvoBinoSDK             **
 ** The GPU buffer is ingested directly into OpenGL texture for avoiding GPU->CPU readback time   **
 ** For the image, this sample shows how to show a gray image					                 **
 ** For the depth, this sample shows how to show a RGBA image                                     **
@@ -28,8 +28,7 @@
 #include <cuda_runtime.h>
 #include <cuda_gl_interop.h>
 
-//Bino SDK header
-#include "evo_global_define.h"//global define
+//EvoBinoSDK header
 #include "evo_depthcamera.h"//depth camera
 
 //high resolution clock
@@ -92,9 +91,9 @@ void handleKeypress(unsigned char key, int x, int y)
 
 void draw()
 {
-	evo::bino::RESULT_CODE res = camera.grab(grab_parameters);
+	evo::RESULT_CODE res = camera.grab(grab_parameters);
 
-	if (res == evo::bino::RESULT_CODE_OK)
+	if (res == evo::RESULT_CODE_OK)
 	{
 		//Map GPU Ressource for Image
 		evo_image_gpu = camera.retrieveImage(evo::bino::SIDE_LEFT, evo::MAT_TYPE_GPU);//gray 1 channel
@@ -187,8 +186,8 @@ int main(int argc, char* argv[])
 {
 	//open camera
 	evo::bino::RESOLUTION_FPS_MODE res_mode = evo::bino::RESOLUTION_FPS_MODE_HD720_60;
-	evo::bino::RESULT_CODE res = camera.open(res_mode);
-	if (res == evo::bino::RESULT_CODE_OK)
+	evo::RESULT_CODE res = camera.open(res_mode);
+	if (res == evo::RESULT_CODE_OK)
 	{
 		std::cout << "depth camera open: " << result_code2str(res) << std::endl;
 		//get Image Size

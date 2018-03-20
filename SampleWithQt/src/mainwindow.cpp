@@ -1,7 +1,7 @@
 ﻿/**************************************************************************************************
-** This sample demonstrates how to use the Evo SDK with Qt, OpenGL and CUDA at the same time     **
+** This sample demonstrates how to use the EvoBinoSDK with Qt, OpenGL and CUDA at the same time  **
 ** The GPU buffer is ingested directly into OpenGL texture for avoiding GPU->CPU readback time   **
-** For the image, this sample shows how to show a gray image					                 **
+** For the image, this sample shows how to show a gray image                                     **
 ** For the depth, this sample shows how to show a RGBA image                                     **
 ***************************************************************************************************/
 
@@ -22,7 +22,7 @@ MainWindow::MainWindow(UpdateBehavior updateBehavior, QOpenGLWindow *parent) : Q
 {
 	//open camera
 	evo::bino::RESOLUTION_FPS_MODE res_mode = evo::bino::RESOLUTION_FPS_MODE_HD720_60;
-	evo::bino::RESULT_CODE res = camera.open(res_mode);
+	evo::RESULT_CODE res = camera.open(res_mode);
 	std::cout << "depth camera open:" << result_code2str(res) << std::endl;
 	//get Image Size
 	w = camera.getImageSizeFPS().width;
@@ -95,9 +95,9 @@ void MainWindow::paintGL()
 
 void MainWindow::capture()
 {
-	evo::bino::RESULT_CODE res = camera.grab(grab_parameters);
+	evo::RESULT_CODE res = camera.grab(grab_parameters);
 
-	if (res == evo::bino::RESULT_CODE_OK)
+	if (res == evo::RESULT_CODE_OK)
 	{
 		//Map GPU Ressource for Image
 		evo_image_gpu = camera.retrieveImage(evo::bino::SIDE_LEFT, evo::MAT_TYPE_GPU);//gray 1 channel

@@ -14,7 +14,6 @@ using namespace std;
 #include <pcl/visualization/cloud_viewer.h>
 
 //Evo SDK header
-#include "evo_global_define.h"//global define
 #include "evo_depthcamera.h"//depth camera
 
 //Define Point Type
@@ -27,10 +26,10 @@ int main(int argc, char** argv)
 	evo::bino::DepthCamera camera;
 	//open camera
 	evo::bino::RESOLUTION_FPS_MODE res_mode = evo::bino::RESOLUTION_FPS_MODE_HD720_60;
-	evo::bino::RESULT_CODE res = camera.open(res_mode);
+	evo::RESULT_CODE res = camera.open(res_mode);
 	std::cout << "depth camera open: " << result_code2str(res) << std::endl;
 	
-	if (res == evo::bino::RESULT_CODE_OK)//open camera successed
+	if (res == evo::RESULT_CODE_OK)//open camera successed
 	{
 		//create empty point cloud with smart ptr
 		PointCloud::Ptr cloud(new PointCloud);
@@ -51,7 +50,7 @@ int main(int argc, char** argv)
 		while (!viewer->wasStopped(10))
 		{
 			// Get frames and launch the computation
-			if (camera.grab(grab_parameters) == evo::bino::RESULT_CODE_OK)
+			if (camera.grab(grab_parameters) == evo::RESULT_CODE_OK)
 			{
 				//retrieve point cloud
 				evo_pointcloud = camera.retrieveDepth(evo::bino::DEPTH_TYPE_POINT_CLOUD_XYZBGRA, evo::MAT_TYPE_CPU);
@@ -63,8 +62,8 @@ int main(int argc, char** argv)
 					p.x = evo_pointcloud.data[m * 4];			//X
 					p.y = evo_pointcloud.data[m * 4 + 1];		//Y
 					p.z = evo_pointcloud.data[m * 4 + 2];		//Z
-					int * bgr_ptr = (int*)evo_pointcloud.data + m * 4 + 3;	//B-G-R-A
-					p.rgba = *bgr_ptr;
+					int * color_ptr = (int*)evo_pointcloud.data + m * 4 + 3;	//B-G-R-A
+					p.rgba = *color_ptr;
 					cloud->push_back(p);	//add point to cloud
 				}
 				//show point cloud

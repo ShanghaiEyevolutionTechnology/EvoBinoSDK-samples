@@ -1,5 +1,5 @@
 ﻿/**************************************************************************************************
-** This sample demonstrates how to grab images and depth map with the Evo SDK                    **
+** This sample demonstrates how to grab images and depth map with the EvoBinoSDK                 **
 ** Both images and depth map are displayed with OpenCV GUI                                       **
 ** Most of the functions of the Bino SDK are linked with a key press event (using OpenCV)        **
 ***************************************************************************************************/
@@ -31,8 +31,7 @@
 //opencv header
 #include "opencv2/opencv.hpp"
 
-//Evo SDK header
-#include "evo_global_define.h"//global define
+//EvoBinoSDK header
 #include "evo_depthcamera.h"//depth camera
 #include "evo_matconverter.h"//converter between evo::Mat and cv::Mat
 
@@ -119,7 +118,7 @@ int main(int argc, char* argv[])
 {
 	//open camera
 	evo::bino::RESOLUTION_FPS_MODE res_mode = evo::bino::RESOLUTION_FPS_MODE_HD720_60;
-	evo::bino::RESULT_CODE res = camera.open(res_mode);
+	evo::RESULT_CODE res = camera.open(res_mode);
 	std::cout << "depth camera open: " << result_code2str(res) << std::endl;
 	//show image size
 	std::cout << "image width:" << camera.getImageSizeFPS().width << ", height:" << camera.getImageSizeFPS().height << std::endl;
@@ -129,7 +128,7 @@ int main(int argc, char* argv[])
 	//grab parameters
 	evo::bino::GrabParameters grab_parameters;
 
-	if (res == evo::bino::RESULT_CODE_OK)//open camera successed
+	if (res == evo::RESULT_CODE_OK)//open camera successed
 	{
 		//evo Mat
 		evo::Mat<unsigned char> evo_image, evo_depth;//evo Mat for image/depth display
@@ -148,7 +147,7 @@ int main(int argc, char* argv[])
 		while (running)
 		{
 			// Get frames and launch the computation
-			if (camera.grab(grab_parameters) == evo::bino::RESULT_CODE_OK)
+			if (camera.grab(grab_parameters) == evo::RESULT_CODE_OK)
 			{
 				//retrieve image
 				//retrieveView() returns a RGBA Mat, so when using OpenCV to show it, we need to swap R and B channel
@@ -244,7 +243,7 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		std::cerr << "open camera failed: " << evo::bino::result_code2str(res) << std::endl;
+		std::cerr << "open camera failed: " << evo::result_code2str(res) << std::endl;
 	}
 	return 0;
 }

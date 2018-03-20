@@ -4,7 +4,7 @@
 ***************************************************************************************************/
 
 
-//Evo SDK header
+//EvoBinoSDK header
 #include "evo_depthcamera.h"
 
 int main(int argc, char* argv[])
@@ -13,10 +13,10 @@ int main(int argc, char* argv[])
 	evo::bino::DepthCamera camera;
 
 	// Open camera
-	evo::bino::RESULT_CODE res = camera.open(evo::bino::RESOLUTION_FPS_MODE_HD720_60);
+	evo::RESULT_CODE res = camera.open(evo::bino::RESOLUTION_FPS_MODE_HD720_60);
 	
 	// If successed
-	if (res == evo::bino::RESULT_CODE_OK)
+	if (res == evo::RESULT_CODE_OK)
 	{
 		// Print serial number and SDK version
 		std::cout << "serial number: " << camera.getSerialNumber() << std::endl;
@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		std::cerr << "open camera failed: " << evo::bino::result_code2str(res) << std::endl;
+		std::cerr << "open camera failed: " << evo::result_code2str(res) << std::endl;
 	}
 	return 0;
 }

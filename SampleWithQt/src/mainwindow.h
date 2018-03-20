@@ -9,8 +9,7 @@
 #include <cuda_runtime.h>
 #include <cuda_gl_interop.h>
 
-//Bino SDK header
-#include "evo_global_define.h"//global define
+//EvoBinoSDK header
 #include "evo_depthcamera.h"//depth camera
 
 
