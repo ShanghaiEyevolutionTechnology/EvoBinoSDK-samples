@@ -5,12 +5,12 @@
 
 
 //EvoBinoSDK header
-#include "evo_depthcamera.h"
+#include "evo_stereocamera.h"
 
 int main(int argc, char* argv[])
 {
 	// Create a camera object
-	evo::bino::DepthCamera camera;
+	evo::bino::StereoCamera camera;
 
 	// Open camera
 	evo::RESULT_CODE res = camera.open(evo::bino::RESOLUTION_FPS_MODE_HD720_60);

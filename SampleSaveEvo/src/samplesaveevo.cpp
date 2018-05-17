@@ -14,7 +14,7 @@
 int target_frame_number = 100;
 
 // Target .evo file name
-char* filename = "test.evo";
+std::string filename = "test.evo";
 
 int main(int argc, char* argv[])
 {
@@ -32,7 +32,11 @@ int main(int argc, char* argv[])
 		std::cout << "SDK version: " << camera.getSDKVersion() << std::endl;
 		
 		// Init recording using default compress
-		res = camera.initRecording(filename);
+		// If you set 2nd parameter to true, you may save the .imu file at the same time
+		res = camera.initRecording(filename.c_str(), false);
+
+		// If you select to save IMU data at the same time, remember to start IMU retrieving
+		//camera.startRetrieveIMU();
 
 		// If successed
 		if (res == evo::RESULT_CODE_OK)

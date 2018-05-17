@@ -17,29 +17,31 @@ else()
 	set(CMAKE_CXX_STANDARD_REQUIRED ON) #...is required...
 	set(CMAKE_CXX_EXTENSIONS OFF) #..without compiler extensions like gnu++11
 
-
 	FIND_PACKAGE(EvoBinoSDK REQUIRED)
 endif()
+	
+if (EvoBinoSDK_WITH_CUDA)
 
-#For QT
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-find_package(Qt5Widgets REQUIRED)
-find_package(Qt5OpenGL REQUIRED)
+	#For QT
+	set(CMAKE_INCLUDE_CURRENT_DIR ON)
+	set(CMAKE_AUTOMOC ON)
+	set(CMAKE_AUTOUIC ON)
+	find_package(Qt5Widgets REQUIRED)
+	find_package(Qt5OpenGL REQUIRED)
 
-find_package(CUDA REQUIRED)
-include_directories(${EvoBinoSDK_INCLUDE_DIRS} ${CUDA_INCLUDE_DIRS})
+	find_package(CUDA REQUIRED)
+	include_directories(${EvoBinoSDK_INCLUDE_DIRS} ${CUDA_INCLUDE_DIRS})
 
-if(insideSDK)
-	ADD_EXE_MODULE(${TARGET_NAME} ${FOLDERNAME})
-	set_target_properties (${TARGET_NAME} PROPERTIES FOLDER ${FOLDERNAME})
-else()
-	file(GLOB DIR_HEADERS "*.h")
-	file(GLOB DIR_CPP_SRCS "*.cpp")
+	if(insideSDK)
+		ADD_EXE_MODULE(${TARGET_NAME} ${FOLDERNAME})
+		set_target_properties (${TARGET_NAME} PROPERTIES FOLDER ${FOLDERNAME})
+	else()
+		file(GLOB DIR_HEADERS "*.h")
+		file(GLOB DIR_CPP_SRCS "*.cpp")
 
-	add_executable(${TARGET_NAME} ${DIR_HEADERS} ${DIR_CPP_SRCS})
-endif()
+		add_executable(${TARGET_NAME} ${DIR_HEADERS} ${DIR_CPP_SRCS})
+	endif()
 
-target_link_libraries(${TARGET_NAME} ${EvoBinoSDK_LIBRARIES} ${CUDA_LIBRARIES} Qt5::Widgets Qt5::OpenGL) 
+	target_link_libraries(${TARGET_NAME} ${EvoBinoSDK_LIBRARIES} ${CUDA_LIBRARIES} Qt5::Widgets Qt5::OpenGL) 
 
+endif (EvoBinoSDK_WITH_CUDA)

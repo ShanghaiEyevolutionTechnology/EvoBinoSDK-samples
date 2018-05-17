@@ -94,7 +94,7 @@ void handleKey(char key)
 		break;
 	case 'w'://stereo parameter
 		stereoPara = camera.getStereoParameters(true);
-		std::cout << "baseline: " << stereoPara.T.value[0] << ", focal: " << stereoPara.leftCam.focal.x << std::endl;
+		std::cout << "baseline: " << stereoPara.baseline() << ", focal: " << stereoPara.leftCam.focal.x << std::endl;
 		break;
 	case 'e'://flip
 		camera.setFlip(!camera.getFlip());

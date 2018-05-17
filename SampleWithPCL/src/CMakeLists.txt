@@ -17,30 +17,32 @@ else()
 	set(CMAKE_CXX_STANDARD_REQUIRED ON) #...is required...
 	set(CMAKE_CXX_EXTENSIONS OFF) #..without compiler extensions like gnu++11
 
-
 	FIND_PACKAGE(EvoBinoSDK REQUIRED)
 endif()
 
-# PCL Libraries
-find_package( PCL COMPONENTS common io visualization )
-if(PCL_FOUND)
-	
-	# add header and libraries
-	add_definitions( ${PCL_DEFINITIONS} )
-	include_directories( ${PCL_INCLUDE_DIRS}  )
-	link_directories( ${PCL_LIBRARY_DIRS} )	
-	include_directories(${EvoBinoSDK_INCLUDE_DIRS})
-	
-	if(insideSDK)
-		ADD_EXE_MODULE(${TARGET_NAME} ${FOLDERNAME})
-		set_target_properties (${TARGET_NAME} PROPERTIES FOLDER ${FOLDERNAME})
-	else()
-		file(GLOB DIR_HEADERS "*.h")
-		file(GLOB DIR_CPP_SRCS "*.cpp")
+if (EvoBinoSDK_WITH_CUDA)
+	# PCL Libraries
+	find_package( PCL COMPONENTS common io visualization )
+	if(PCL_FOUND)
+		
+		# add header and libraries
+		add_definitions( ${PCL_DEFINITIONS} )
+		include_directories( ${PCL_INCLUDE_DIRS}  )
+		link_directories( ${PCL_LIBRARY_DIRS} )	
+		include_directories(${EvoBinoSDK_INCLUDE_DIRS})
+		
+		if(insideSDK)
+			ADD_EXE_MODULE(${TARGET_NAME} ${FOLDERNAME})
+			set_target_properties (${TARGET_NAME} PROPERTIES FOLDER ${FOLDERNAME})
+		else()
+			file(GLOB DIR_HEADERS "*.h")
+			file(GLOB DIR_CPP_SRCS "*.cpp")
 
-		add_executable(${TARGET_NAME} ${DIR_HEADERS} ${DIR_CPP_SRCS})
-	endif()
+			add_executable(${TARGET_NAME} ${DIR_HEADERS} ${DIR_CPP_SRCS})
+		endif()
 
-	target_link_libraries(${TARGET_NAME} ${EvoBinoSDK_LIBRARIES} ${PCL_LIBRARIES}) 
-	
-endif(PCL_FOUND)
+		target_link_libraries(${TARGET_NAME} ${EvoBinoSDK_LIBRARIES} ${PCL_LIBRARIES}) 
+		
+	endif(PCL_FOUND)
+
+endif (EvoBinoSDK_WITH_CUDA)

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
 
-set(TARGET_NAME SampleHelloWorld)
+set(TARGET_NAME SampleGetIMUData)
 
 if(DEFINED PROJECT_NAME)
 	set(insideSDK true)
@@ -17,11 +17,13 @@ else()
 	set(CMAKE_CXX_STANDARD_REQUIRED ON) #...is required...
 	set(CMAKE_CXX_EXTENSIONS OFF) #..without compiler extensions like gnu++11
 
+
 	FIND_PACKAGE(EvoBinoSDK REQUIRED)
 endif()
 
-	include_directories(${EvoBinoSDK_INCLUDE_DIRS})
-
+find_package(Eigen3 REQUIRED)
+include_directories(${EvoBinoSDK_INCLUDE_DIRS})
+include_directories(${EIGEN3_INCLUDE_DIR})
 
 if(insideSDK)
 	ADD_EXE_MODULE(${TARGET_NAME} ${FOLDERNAME})

@@ -46,7 +46,7 @@ int w, h;//image width/height
 //declare some ressources (GL texture ID, GL shader ID...)
 GLuint imageTex, depthTex;
 cudaGraphicsResource *pcuImageRes, *pcuDepthRes;
-std::chrono::time_point<std::chrono::system_clock> now, last;
+std::chrono::time_point<std::chrono::high_resolution_clock> now, last;
 bool show_fps = false;
 
 
