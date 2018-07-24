@@ -41,6 +41,6 @@ if (EvoBinoSDK_WITH_CUDA)
 		cuda_add_executable(${TARGET_NAME} ${SOURCE_FILES})
 	endif()
 
-	target_link_libraries(${TARGET_NAME} ${EvoBinoSDK_LIBRARIES} ${CUDA_LIBRARIES} ${OpenCV_LIBS}) 
+	target_link_libraries(${TARGET_NAME} ${EvoBinoSDK_LIBRARIES} ${OpenCV_LIBS} ${CUDA_LIBRARIES}) 
 
 endif (EvoBinoSDK_WITH_CUDA)

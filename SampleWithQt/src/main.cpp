@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include <QApplication>
 
 #ifdef EVO_ENV_WINDOWS

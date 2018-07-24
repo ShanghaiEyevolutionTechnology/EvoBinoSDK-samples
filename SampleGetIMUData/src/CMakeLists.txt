@@ -19,6 +19,8 @@ else()
 
 
 	FIND_PACKAGE(EvoBinoSDK REQUIRED)
+	
+	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}     "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 endif()
 
 find_package(Eigen3 REQUIRED)

@@ -1,4 +1,4 @@
-#include "cuda_func.cuh"
+﻿#include "cuda_func.cuh"
 
 __global__ void create_checkerboard_kernel(unsigned char *pImage, unsigned int width, unsigned int height, int square_size, uchar3 color1, uchar3 color2)
 {

@@ -7,7 +7,7 @@
 #include <thread>
 
 //EvoBinoSDK header
-// We use StereoCamera here because we only want to save the image sequences, and do not need depth calculation.
+// We use StereoCamera here for better saving speed.
 #include "evo_stereocamera.h"
 
 // Target frame number, for example : 100
@@ -20,6 +20,10 @@ int main(int argc, char* argv[])
 {
 	// Create a camera object
 	evo::bino::StereoCamera camera;
+
+	//set not do recify to speed up the process, depth calculation will not be done too
+	evo::bino::GrabParameters grab_parameters;
+	grab_parameters.do_rectify = false;
 
 	// Open camera
 	evo::RESULT_CODE res = camera.open(evo::bino::RESOLUTION_FPS_MODE_HD720_60);
@@ -49,7 +53,7 @@ int main(int argc, char* argv[])
 			{
 				// Get frames, do not do CPU rectify, it may be slow on some device
 				// Check the grab result, if result is evo::RESULT_CODE_NOT_A_NEW_FRAME, it means new frame is not come, just wait and grab again
-				if (camera.grab(false) == evo::RESULT_CODE_OK)
+				if (camera.grab(grab_parameters) == evo::RESULT_CODE_OK)
 				{
 					// You can retrieve image for displaying here, or just skip retrieving
 					//evo::Mat<unsigned char> sbs = camera.retrieveImage(evo::bino::SIDE_SBS);

@@ -26,10 +26,11 @@ if (EvoBinoSDK_WITH_CUDA)
 	if(PCL_FOUND)
 		
 		# add header and libraries
-		add_definitions( ${PCL_DEFINITIONS} )
-		include_directories( ${PCL_INCLUDE_DIRS}  )
-		link_directories( ${PCL_LIBRARY_DIRS} )	
+		add_definitions(${PCL_DEFINITIONS})
+		include_directories(${PCL_INCLUDE_DIRS})
+		link_directories(${PCL_LIBRARY_DIRS} )	
 		include_directories(${EvoBinoSDK_INCLUDE_DIRS})
+		list(REMOVE_ITEM PCL_LIBRARIES "vtkproj4")
 		
 		if(insideSDK)
 			ADD_EXE_MODULE(${TARGET_NAME} ${FOLDERNAME})
