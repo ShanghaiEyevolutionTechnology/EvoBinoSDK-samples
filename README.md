@@ -29,6 +29,8 @@ SampleWithPCL - This sample shows how to get point cloud data by EvoBino SDK, an
 
 SampleWithQt - This sample shows how to use EvoBino SDK with QT5.
 
+SampleEvoToAvi - This sample shows how to convert .evo file to .avi file.
+
 <br/>
 
 # Support
