@@ -13,9 +13,15 @@ Documentation page: http://leadsense.ilooktech.com/sdk/docs
 
 The EvoBinoSDK tutorials and samples that demonstrate the API features and code.
 
+SampleEvoToAvi - This sample shows how to convert .evo file to .avi file.
+
+SampleEvoToImageSequences - This sample shows how to convert .evo file to image sequence files.
+
 SampleGetIMUData - This sample shows how to get all types of IMU data by EvoBino SDK.
 
 SampleHelloWorld - A basic tutorials that explains how to build an application with the EvoBino SDK on Windows and Linux platforms.
+
+SampleObstacleDetection - This sample shows how to use obstacle detection functions provided by EvoBino SDK.
 
 SampleSaveEvo - This sample shows how to save evo file by EvoBino SDK.
 
@@ -28,8 +34,6 @@ SampleWithOpenGL - This sample shows how to capture image and depth by EvoBino S
 SampleWithPCL - This sample shows how to get point cloud data by EvoBino SDK, and show them by PCL.
 
 SampleWithQt - This sample shows how to use EvoBino SDK with QT5.
-
-SampleEvoToAvi - This sample shows how to convert .evo file to .avi file.
 
 <br/>
 

@@ -73,6 +73,7 @@ int main(int argc, char** argv)
 
 		cloud->points.clear();
 	}
+	camera.close();
 
 	return 0;
 }

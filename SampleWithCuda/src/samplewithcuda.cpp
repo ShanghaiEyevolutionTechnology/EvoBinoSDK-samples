@@ -30,7 +30,7 @@
 
 //EvoBinoSDK header
 #include "evo_depthcamera.h"//depth camera
-#include "evo_matconverter.h"//converter between evo Mat and cv Mat
+#include "evo_matconverter.h"//converter between evo mat and OpenCV mat
 
 //Cuda functions
 #include "cuda_func.cuh"

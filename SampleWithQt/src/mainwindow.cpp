@@ -24,56 +24,79 @@ MainWindow::MainWindow(UpdateBehavior updateBehavior, QOpenGLWindow *parent) : Q
 	evo::bino::RESOLUTION_FPS_MODE res_mode = evo::bino::RESOLUTION_FPS_MODE_HD720_60;
 	evo::RESULT_CODE res = camera.open(res_mode);
 	std::cout << "depth camera open:" << result_code2str(res) << std::endl;
-	//get Image Size
-	w = camera.getImageSizeFPS().width;
-	h = camera.getImageSizeFPS().height;
-	std::cout << "image width:" << w << ", height:" << h << std::endl;
+	
+	if (res == evo::RESULT_CODE_OK)
+	{
+		//get Image Size
+		w = camera.getImageSizeFPS().width;
+		h = camera.getImageSizeFPS().height;
+		std::cout << "image width:" << w << ", height:" << h << std::endl;
 
-	//running flag
-	running = false;
-	//init window parameter
-	this->setTitle(tr("Eyevolution Qt Sample"));
-	this->setHeight(h); 
-	this->setWidth(w * 2);
+		//init window parameter
+		this->setTitle(tr("Eyevolution Qt Sample"));
+		this->setHeight(h);
+		this->setWidth(w * 2);
+	}
 }
 
 MainWindow::~MainWindow()
 {
 	//close camera
 	camera.close();
-	
-	glBindTexture(GL_TEXTURE_2D, 0);
-	std::cout << "exit" << std::endl;
+
+	if (inited)
+	{
+		cudaError_t err = cudaGraphicsUnregisterResource(pcuImageRes);
+		glBindTexture(GL_TEXTURE_2D, imageTex);
+		glDeleteTextures(1, &imageTex);
+		err = cudaGraphicsUnregisterResource(pcuDepthRes);
+		glBindTexture(GL_TEXTURE_2D, depthTex);
+		glDeleteTextures(1, &depthTex);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		std::cout << "exit" << std::endl;
+	}
 }
 
 void MainWindow::initializeGL()
 {
 	initializeOpenGLFunctions();
 
-	cudaError_t err1, err2;
-	//Create and Register OpenGL Texture for Image (Gray - 1 Channel)
-	glGenTextures(1, &imageTex);
-	glBindTexture(GL_TEXTURE_2D, imageTex);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, w, h, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, NULL);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	err1 = cudaGraphicsGLRegisterImage(&pcuImageRes, imageTex, GL_TEXTURE_2D, cudaGraphicsMapFlagsNone);
-	
-	//Create and Register a OpenGL texture for Depth (RGBA - 4 Channels)
-	glGenTextures(1, &depthTex);
-	glBindTexture(GL_TEXTURE_2D, depthTex);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	err2 = cudaGraphicsGLRegisterImage(&pcuDepthRes, depthTex, GL_TEXTURE_2D, cudaGraphicsMapFlagsNone);
+	if (w > 0 && h > 0)
+	{
+		cudaError_t err1, err2;
+		//Create and Register OpenGL Texture for Image (Gray - 1 Channel)
+		glGenTextures(1, &imageTex);
+		glBindTexture(GL_TEXTURE_2D, imageTex);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, w, h, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, NULL);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		err1 = cudaGraphicsGLRegisterImage(&pcuImageRes, imageTex, GL_TEXTURE_2D, cudaGraphicsMapFlagsNone);
 
-	if (err1 != 0 || err2 != 0) std::cout << "CUDA resource register failed" << std::endl;
+		//Create and Register a OpenGL texture for Depth (RGBA - 4 Channels)
+		glGenTextures(1, &depthTex);
+		glBindTexture(GL_TEXTURE_2D, depthTex);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		err2 = cudaGraphicsGLRegisterImage(&pcuDepthRes, depthTex, GL_TEXTURE_2D, cudaGraphicsMapFlagsNone);
 
-	glEnable(GL_TEXTURE_2D);
+		if (err1 != 0 || err2 != 0) std::cout << "CUDA resource register failed" << std::endl;
 
-	running = true;
+		glEnable(GL_TEXTURE_2D);
+
+		running = true;
+		inited = true;
+	}
+	else
+	{
+		running = false;
+		inited = false;
+		qDebug("open camera failed");
+		close();
+	}
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *e)
@@ -99,9 +122,11 @@ void MainWindow::capture()
 
 	if (res == evo::RESULT_CODE_OK)
 	{
-		//Map GPU Ressource for Image
+		//Retrieve image and normalized depth
 		evo_image_gpu = camera.retrieveImage(evo::bino::SIDE_LEFT, evo::MAT_TYPE_GPU);//gray 1 channel
+		evo_depth_gpu = camera.retrieveNormalizedDepth(evo::bino::DEPTH_TYPE_DISTANCE_Z_COLOR, evo::MAT_TYPE_GPU, 255, 0);//RGBA 4 channels
 
+		//Map GPU Ressource for Image
 		cudaArray_t image_cuda_array;
 		cudaGraphicsMapResources(1, &pcuImageRes, 0);
 		cudaGraphicsSubResourceGetMappedArray(&image_cuda_array, pcuImageRes, 0, 0);
@@ -109,7 +134,6 @@ void MainWindow::capture()
 		cudaGraphicsUnmapResources(1, &pcuImageRes, 0);
 
 		//Map GPU Ressource for Depth
-		evo_depth_gpu = camera.retrieveNormalizedDepth(evo::bino::DEPTH_TYPE_DISTANCE_Z_COLOR, evo::MAT_TYPE_GPU, 255, 0);//RGBA 4 channels
 		cudaArray_t depth_cuda_array;
 		cudaGraphicsMapResources(1, &pcuDepthRes, 0);
 		cudaGraphicsSubResourceGetMappedArray(&depth_cuda_array, pcuDepthRes, 0, 0);
@@ -121,9 +145,10 @@ void MainWindow::capture()
 		glLoadIdentity();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+		glEnable(GL_TEXTURE_2D);
 		//Draw Image Texture in Left Part of Side by Side
 		glBindTexture(GL_TEXTURE_2D, imageTex);
-
 		glBegin(GL_QUADS);
 		glTexCoord2f(0.0, 1.0);
 		glVertex2f(-1.0, -1.0);
@@ -134,12 +159,10 @@ void MainWindow::capture()
 		glTexCoord2f(0.0, 0.0);
 		glVertex2f(-1.0, 1.0);
 		glEnd();
-
-		glUseProgram(0);
+		glBindTexture(GL_TEXTURE_2D, 0);
 
 		//Draw Depth Texture in Right Part of Side by Side
 		glBindTexture(GL_TEXTURE_2D, depthTex);
-
 		glBegin(GL_QUADS);
 		glTexCoord2f(0.0, 1.0);
 		glVertex2f(0.0, -1.0);
@@ -150,8 +173,8 @@ void MainWindow::capture()
 		glTexCoord2f(0.0, 0.0);
 		glVertex2f(0.0, 1.0);
 		glEnd();
-
 		glBindTexture(GL_TEXTURE_2D, 0);
+		glDisable(GL_TEXTURE_2D);
 		glFinish();
 	}
 	update();

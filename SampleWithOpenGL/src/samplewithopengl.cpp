@@ -95,9 +95,11 @@ void draw()
 
 	if (res == evo::RESULT_CODE_OK)
 	{
-		//Map GPU Ressource for Image
+		//Retrieve image and normalized depth
 		evo_image_gpu = camera.retrieveImage(evo::bino::SIDE_LEFT, evo::MAT_TYPE_GPU);//gray 1 channel
+		evo_depth_gpu = camera.retrieveNormalizedDepth(evo::bino::DEPTH_TYPE_DISTANCE_Z_COLOR, evo::MAT_TYPE_GPU, 255, 0);//RGBA 4 channels
 
+		//Map GPU Ressource for Image
 		cudaArray_t image_cuda_array;
 		cudaGraphicsMapResources(1, &pcuImageRes, 0);
 		cudaGraphicsSubResourceGetMappedArray(&image_cuda_array, pcuImageRes, 0, 0);
@@ -105,7 +107,6 @@ void draw()
 		cudaGraphicsUnmapResources(1, &pcuImageRes, 0);
 
 		//Map GPU Ressource for Depth
-		evo_depth_gpu = camera.retrieveNormalizedDepth(evo::bino::DEPTH_TYPE_DISTANCE_Z_COLOR, evo::MAT_TYPE_GPU, 255, 0);//RGBA 4 channels
 		cudaArray_t depth_cuda_array;
 		cudaGraphicsMapResources(1, &pcuDepthRes, 0);
 		cudaGraphicsSubResourceGetMappedArray(&depth_cuda_array, pcuDepthRes, 0, 0);
@@ -175,7 +176,13 @@ void draw()
 	if (!running) {
 		glutLeaveMainLoop();
 		glutDestroyWindow(1);
-		camera.close();
+		camera.close();	
+		cudaError_t err = cudaGraphicsUnregisterResource(pcuImageRes);
+		glBindTexture(GL_TEXTURE_2D, imageTex);
+		glDeleteTextures(1, &imageTex);
+		err = cudaGraphicsUnregisterResource(pcuDepthRes);
+		glBindTexture(GL_TEXTURE_2D, depthTex);
+		glDeleteTextures(1, &depthTex);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 }
@@ -185,11 +192,11 @@ void draw()
 int main(int argc, char* argv[])
 {
 	//open camera
-	evo::bino::RESOLUTION_FPS_MODE res_mode = evo::bino::RESOLUTION_FPS_MODE_HD720_60;
-	evo::RESULT_CODE res = camera.open(res_mode);
+	evo::RESULT_CODE res = camera.open(evo::bino::RESOLUTION_FPS_MODE_HD720_60);
+	std::cout << "depth camera open: " << result_code2str(res) << std::endl;
+
 	if (res == evo::RESULT_CODE_OK)
 	{
-		std::cout << "depth camera open: " << result_code2str(res) << std::endl;
 		//get Image Size
 		w = camera.getImageSizeFPS().width;
 		h = camera.getImageSizeFPS().height;
@@ -198,7 +205,7 @@ int main(int argc, char* argv[])
 		//init glut
 		glutInit(&argc, argv);
 
-		/*Setting up  The Display  */
+		//Setting up The Display
 		glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 		//Configure Window Postion
 		glutInitWindowPosition(0, 0);

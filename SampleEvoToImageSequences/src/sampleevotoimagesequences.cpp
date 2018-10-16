@@ -1,13 +1,13 @@
 ﻿/**************************************************************************************************
-** This sample simply shows how to transform one .evo file to .avi file.                         **
-** Left view, right view and side-by-side avi file will be generated.                            **
+** This sample simply shows how to save image sequences for .evo file.                           **
+** Image sequences file named with frame number will be saved.                                   **
 ***************************************************************************************************/
 
 //header for the stereocamera
 #include "evo_stereocamera.h"
 //used to transform evo mat to OpenCV mat
 #include "evo_matconverter.h"
-//use OpenCV to save .avi file
+//use OpenCV to save image sequences file
 #include <opencv2/core/core.hpp>
 
 //the bool value is used to work with the hotkey for breaking out
@@ -35,31 +35,17 @@ int main(int argc, char* argv[])
 	evo::bino::StereoCamera camera;
 
 	//the user input: name of this program, file name of the evo file, do rectify or not(0 = no rectify, 1 = do rectify), start index of frame(int), end index of frame(int)
-	std::cout << "usage: SampleEvoToAvi [. evo file, (only file name, without .evo)] [do rectify or not(default = 0, when value = 1, do rectify)][start index, default = 0][end index, default: end of the file]" << std::endl;
+	std::cout << "usage: SampleEvoToImageSequences [. evo file, (only file name, without .evo)] [do rectify or not(default = 0, when value = 1, do rectify)][start index, default = 0][end index, default: end of the file]" << std::endl;
 
 	//file name of the input evo file
 	std::string file_name;
-	//file name of the  sidy-by-side output avi file
-	std::string file_name2;
-	//file name of the  left-view output avi file
-	std::string file_name3;
-	//file name of the  right-view output avi file
-	std::string file_name4;
+	std::string full_file_name;
 
 	//the evo mat used to read evo file
 	evo::Mat<unsigned char> image;
-	evo::Mat<unsigned char> imageL;
-	evo::Mat<unsigned char> imageR;
 
-	//the cv mat used to save avi file
+	//the cv mat used to save image sequences file
 	cv::Mat cvImage;
-	cv::Mat cvImageL;
-	cv::Mat cvImageR;
-
-	//the video write used to save avi file
-	cv::VideoWriter writer;
-	cv::VideoWriter writerL;
-	cv::VideoWriter writerR;
 
 	//save the rectified image or raw image
 	bool rectify = false;
@@ -96,38 +82,20 @@ int main(int argc, char* argv[])
 	}
 	std::cout << "do rectify: " << rectify << std::endl;
 
-	file_name2 = file_name;
-	file_name3 = file_name;
-	file_name4 = file_name;
+	full_file_name = file_name + ".evo";
 
-	file_name.append(".evo");
-	file_name2.append(".avi");
-	file_name3.append("L.avi");
-	file_name4.append("R.avi");
-
-	std::cout << file_name << std::endl;
+	std::cout << full_file_name << std::endl;
 
 	//parameters for grabbing frame from .evo file
 	evo::bino::GrabParameters grab_parameters;
 	//this parameter will define do rectify or not
 	grab_parameters.do_rectify = rectify;
-	//since we only want to save .avi file, do not calculate disparity
+	//since we only want to save image sequences, do not calculate disparity
 	grab_parameters.calc_disparity = false;
 
 	//open the evo file
-	if (camera.open(file_name.c_str()) == evo::RESULT_CODE_OK)
+	if (camera.open(full_file_name.c_str()) == evo::RESULT_CODE_OK)
 	{
-		//initial the avi file writer
-		writer.open(file_name2, CV_FOURCC('M', 'P', '4', '2'), (double)camera.getImageSizeFPS().fps, cvSize(camera.getImageSizeFPS().width * 2, camera.getImageSizeFPS().height), false);
-		writerL.open(file_name3, CV_FOURCC('M', 'P', '4', '2'), (double)camera.getImageSizeFPS().fps, cvSize(camera.getImageSizeFPS().width, camera.getImageSizeFPS().height), false);
-		writerR.open(file_name4, CV_FOURCC('M', 'P', '4', '2'), (double)camera.getImageSizeFPS().fps, cvSize(camera.getImageSizeFPS().width, camera.getImageSizeFPS().height), false);
-
-		if (!writer.isOpened() || !writerL.isOpened() || !writerR.isOpened())
-		{
-			std::cout << "create avi file failed" << std::endl;
-			return 0;
-		}
-
 		//set the start index to camera
 		camera.setTargetEvoPosition(frame_index);
 
@@ -146,30 +114,28 @@ int main(int argc, char* argv[])
 			{
 				//retrieve image from evo file
 				image = camera.retrieveImage(evo::bino::SIDE_SBS);
-				imageL = camera.retrieveImage(evo::bino::SIDE_LEFT);
-				imageR = camera.retrieveImage(evo::bino::SIDE_RIGHT);
 
 				//transform evo mat to open cv mat
 				cvImage = evo::evoMat2cvMat(image);
-				cvImageL = evo::evoMat2cvMat(imageL);
-				cvImageR = evo::evoMat2cvMat(imageR);
 
-				//write the frame to avi file
-				writer << cvImage;
-				writerL << cvImageL;
-				writerR << cvImageR;
+				//get current frame index
+				int index = camera.getCurrentEvoPosition();
+
+				//generate image file name
+				std::string image_file_name = file_name + "_" + std::to_string(index) + ".png";
+
+				//write the frame to png file
+				cv::imwrite(image_file_name, cvImage);
 
 				//show current frame
 				cv::imshow("image", cvImage);
 
+				//handle key event
 				handleKey((char)cv::waitKey(10));
 			}
 		}
 
 		cv::waitKey(100);
-		writer.release();
-		writerL.release();
-		writerR.release();
 		camera.close();
 	}
 	else

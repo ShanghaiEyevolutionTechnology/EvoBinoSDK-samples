@@ -8,16 +8,16 @@ endif(DEFINED PROJECT_NAME)
 
 if(insideSDK)
 	# inside sdk project
-	SET(EvoBinoSDK_LIBRARIES evo_depthcamera)
+	set(EvoBinoSDK_LIBRARIES evo_depthcamera)
 else()
 	# external build
-	PROJECT( ${TARGET_NAME} )
+	project( ${TARGET_NAME} )
 	
 	set(CMAKE_CXX_STANDARD 11) #C++ 11...
 	set(CMAKE_CXX_STANDARD_REQUIRED ON) #...is required...
 	set(CMAKE_CXX_EXTENSIONS OFF) #..without compiler extensions like gnu++11
 
-	FIND_PACKAGE(EvoBinoSDK REQUIRED)
+	find_package(EvoBinoSDK REQUIRED)
 endif()
 
 if (EvoBinoSDK_WITH_CUDA)

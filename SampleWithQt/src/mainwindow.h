@@ -27,9 +27,9 @@ protected:
 private:
 	evo::bino::DepthCamera camera;
 	evo::bino::GrabParameters grab_parameters;
-	bool running;
+	bool running, inited;
 	evo::Mat<unsigned char> evo_image_gpu, evo_depth_gpu;
-	int w, h;//image width/height
+	int w = 0, h = 0;//image width/height
 	//declare some ressources (GL texture ID, GL shader ID...)
 	GLuint imageTex;
 	GLuint depthTex;

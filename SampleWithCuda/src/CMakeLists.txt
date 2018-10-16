@@ -8,16 +8,16 @@ endif(DEFINED PROJECT_NAME)
 
 if(insideSDK)
 	# inside sdk project
-	SET(EvoBinoSDK_LIBRARIES evo_depthcamera)
+	set(EvoBinoSDK_LIBRARIES evo_depthcamera)
 else()
 	# external build
-	PROJECT( ${TARGET_NAME} )
+	project( ${TARGET_NAME} )
 	
 	set(CMAKE_CXX_STANDARD 11) #C++ 11...
 	set(CMAKE_CXX_STANDARD_REQUIRED ON) #...is required...
 	set(CMAKE_CXX_EXTENSIONS OFF) #..without compiler extensions like gnu++11
 
-	FIND_PACKAGE(EvoBinoSDK REQUIRED)
+	find_package(EvoBinoSDK REQUIRED)
 endif()
 
 if (EvoBinoSDK_WITH_CUDA)
@@ -32,7 +32,7 @@ if (EvoBinoSDK_WITH_CUDA)
 		set_target_properties (${TARGET_NAME} PROPERTIES FOLDER ${FOLDERNAME})
 	else()
 		file(GLOB SOURCE_FILES "*.cuh" "*.cu" "*.cpp")
-		# nvcc flags;
+		# nvcc flags; you may have to change the sm_xx, compute_xx for your GPU
 		set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-O3 -lineinfo -gencode arch=compute_30,code=\"sm_30,compute_30\")
 		if(WIN32)
 			set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS};-Xcompiler \"/wd 4819\"")

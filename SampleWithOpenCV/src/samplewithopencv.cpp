@@ -21,6 +21,8 @@
 *****   | 'r'   | Save last image (image.png)           || '5'   | Overlay                       |
 *****   | 't'   | Save last depth color (distance.png)  || '7'   | Distance                      |
 *****   | 'y'   | Save last xyz (xyz.png)               || '8'   | Distance color                |
+*****   | 'a'   | Change using auto exposure            ||       |                               |
+*****   | 's/d' | Change exposure time                  ||       |                               |
 *****   |_______|_______________________________________||_______|_______________________________|*/
 
 //standard header
@@ -36,7 +38,7 @@
 #include "evo_matconverter.h"//converter between evo::Mat and cv::Mat
 
 evo::bino::DepthCamera camera;
-bool running = false, saveImage = false, saveNormalizedDistanceZ = false, saveXYZ = false;
+bool running = false, saveImage = false, saveNormalizedDistanceZ = false, saveXYZ = false, autoExposure = true;
 int imageId = 5, depthId = 2;//index for select image/depth
 int mouseX, mouseY;//mouse coordinate
 evo::bino::StereoParameters stereoPara;//stereo parameter
@@ -63,6 +65,7 @@ static void onMouse(int event, int x, int y, int flags, void *param)
 void handleKey(char key)
 {
 	int value = -1;
+	float cur;
 	switch (key)
 	{
 	case '1'://left
@@ -108,6 +111,21 @@ void handleKey(char key)
 		break;
 	case 'y'://save syz
 		saveXYZ = true;
+		break;
+	case 'a':
+		autoExposure = !autoExposure;
+		camera.useAutoExposure(autoExposure);
+		std::cout << "set auto exposure: " << autoExposure << std::endl;
+		break;
+	case 's':
+		cur = camera.getExposureTime();
+		camera.setExposureTime(cur + 1);
+		std::cout << "set exposure time: " << cur + 1 << std::endl;
+		break;
+	case 'd':
+		cur = camera.getExposureTime();
+		camera.setExposureTime(cur - 1);
+		std::cout << "set exposure time: " << cur - 1 << std::endl;
 		break;
 	default:
 		break;

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
 
-set(TARGET_NAME SampleWithOpenGL)
+set(TARGET_NAME SampleObstacleDetection)
 
 if(DEFINED PROJECT_NAME)
 	set(insideSDK true)
@@ -22,14 +22,8 @@ endif()
 	
 if (EvoBinoSDK_WITH_CUDA)
 
-	find_package(CUDA REQUIRED)
-	find_package(GLUT REQUIRED)
-	find_package(OpenGL REQUIRED)
-
-	include_directories(${EvoBinoSDK_INCLUDE_DIRS})
-	include_directories(${CUDA_INCLUDE_DIRS})
-	include_directories(${GLUT_INCLUDE_DIR})
-	include_directories(${OPENGL_INCLUDE_DIR})
+	find_package(OpenCV REQUIRED)
+	include_directories(${EvoBinoSDK_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
 
 	if(insideSDK)
 		ADD_EXE_MODULE(${TARGET_NAME} ${FOLDERNAME})
@@ -41,6 +35,6 @@ if (EvoBinoSDK_WITH_CUDA)
 		add_executable(${TARGET_NAME} ${DIR_HEADERS} ${DIR_CPP_SRCS})
 	endif()
 
-	target_link_libraries(${TARGET_NAME} ${EvoBinoSDK_LIBRARIES} ${CUDA_LIBRARIES} ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES}) 
+	target_link_libraries(${TARGET_NAME} ${EvoBinoSDK_LIBRARIES} ${OpenCV_LIBS}) 
 
 endif (EvoBinoSDK_WITH_CUDA)

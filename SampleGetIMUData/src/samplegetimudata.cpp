@@ -1,18 +1,18 @@
-﻿/**************************************************************************************************
-** This sample simply shows how to get IMU data for 10 seconds.                                  **
-** There are 4 evo::imu::IMU_DATA_TYPE:                                                          **
-**        evo::imu::IMU_DATA_TYPE_RAW, evo::imu::IMU_DATA_TYPE_RAW_CALIBRATED,                   **
-**        evo::imu::IMU_DATA_TYPE_POSITION_6_AXES and evo::imu::IMU_DATA_TYPE_POSITION_9_AXES.   **
-** evo::imu::IMU_DATA_TYPE_RAW gives out raw data:                                               **
-**        accel[3], gryo[3], magnet[3], temperature, timestamp                                   **
-** evo::imu::IMU_DATA_TYPE_RAW_CALIBRATED gives out raw data after calibration:                  **
-**        accel[3], gryo[3], magnet[3], temperature, timestamp                                   **
-** evo::imu::IMU_DATA_TYPE_POSITION_6_AXES gives out position calculated by 6 axes:              **
-**        quaternion[4], accel_residuals[3], temperature, timestamp                              **
-** evo::imu::IMU_DATA_TYPE_POSITION_9_AXES gives out position calculated by 9 axes:              **
-**        quaternion[4], accel_residuals[3], temperature, timestamp                              **
-** IMU may need calibration before getting position data.                                        **
-***************************************************************************************************/
+﻿/***************************************************************************************************************
+** This sample simply shows how to get IMU data for 10 seconds.                                               **
+** There are 4 evo::imu::IMU_DATA_TYPE:                                                                       **
+**        evo::imu::IMU_DATA_TYPE_RAW, evo::imu::IMU_DATA_TYPE_RAW_CALIBRATED,                                **
+**        evo::imu::IMU_DATA_TYPE_POSITION_6_AXES and evo::imu::IMU_DATA_TYPE_POSITION_9_AXES.                **
+** When using evo::imu::IMU_DATA_TYPE_RAW,                                                                    **
+**        only `raw_value`, `temperature`, `timestamp` will be filled.                                        **
+** When using evo::imu::IMU_DATA_TYPE_RAW_CALIBRATED,                                                         **
+**        `raw_value`, `raw_calibrated_value`, `temperature`, `timestamp` will be filled.                     **
+** When using evo::imu::IMU_DATA_TYPE_POSITION_6_AXES,                                                        **
+**        `raw_value`, `raw_calibrated_value`, `position_6_value`, `temperature`, `timestamp` will be filled. **
+** When using evo::imu::IMU_DATA_TYPE_POSITION_9_AXES,                                                        **
+**        `raw_value`, `raw_calibrated_value`, `position_9_value`, `temperature`, `timestamp` will be filled. **
+** IMU may need calibration before getting position data.                                                     **
+***************************************************************************************************************/
 
 #include <iostream>
 #include <thread>
@@ -87,6 +87,13 @@ int main(int argc, char* argv[])
 
 			while (true)
 			{
+				// Grab image
+				//if (camera.grab() == evo::RESULT_CODE_OK)
+				//{
+				//	// Retrieve image
+				//	evo::Mat<unsigned char> left = camera.retrieveImage(evo::bino::SIDE_LEFT);
+				//}
+
 				// Retrieve IMU data
 				std::vector<evo::imu::IMUData> vector_data = camera.retrieveIMUData();
 
@@ -95,7 +102,7 @@ int main(int argc, char* argv[])
 				{
 					evo::imu::IMUData data = vector_data.at(vector_data.size() - 1);
 
-					if ((data_type == evo::imu::IMU_DATA_TYPE_RAW) || (data_type == evo::imu::IMU_DATA_TYPE_RAW_CALIBRATED))
+					if (data_type == evo::imu::IMU_DATA_TYPE_RAW)
 					{
 						std::cout << std::setprecision(4) << std::fixed << "accel/gyro/magnet/time:\t"
 							<< data.accel[0] << " " << data.accel[1] << " " << data.accel[2] << "\t"
@@ -104,14 +111,34 @@ int main(int argc, char* argv[])
 							<< data.timestamp
 							<< std::endl;
 					}
-					else if ((data_type == evo::imu::IMU_DATA_TYPE_POSITION_6_AXES) || (data_type == evo::imu::IMU_DATA_TYPE_POSITION_9_AXES))
+					else if (data_type == evo::imu::IMU_DATA_TYPE_RAW_CALIBRATED)
+					{
+						std::cout << std::setprecision(4) << std::fixed << "calibrated accel/gyro/magnet/time:\t"
+							<< data.accel_calibrated[0] << " " << data.accel_calibrated[1] << " " << data.accel_calibrated[2] << "\t"
+							<< data.gyro_calibrated[0] << " " << data.gyro_calibrated[1] << " " << data.gyro_calibrated[2] << "\t"
+							<< data.mag_calibrated[0] << " " << data.mag_calibrated[1] << " " << data.mag_calibrated[2] << "\t"
+							<< data.timestamp
+							<< std::endl;
+					}
+					else if (data_type == evo::imu::IMU_DATA_TYPE_POSITION_6_AXES)
 					{
 						// Convert Quaternion to Euler
-						Eigen::Quaternionf q(data.quaternion[3], data.quaternion[0], data.quaternion[1], data.quaternion[2]);
+						Eigen::Quaternionf q(data.quaternion_6[3], data.quaternion_6[0], data.quaternion_6[1], data.quaternion_6[2]);
 						Eigen::Matrix3f rotationMatrix = q.matrix().cast<float>();
-						auto euler = rotationMatrix.eulerAngles(0, 1, 2);
-						std::cout << std::setprecision(4) << std::fixed << "roll/pitch/yaw/time:\t"
-							<< euler[0] * 180.0f / M_PI << " " << euler[1] * 180.0f / M_PI << " " << euler[2] * 180.0f / M_PI << "\t"
+						auto euler = rotationMatrix.eulerAngles(1, 0, 2);
+						std::cout << std::setprecision(4) << std::fixed << "6 roll/pitch/yaw/time:\t"
+							<< euler[2] * 180.0f / M_PI << " " << euler[1] * 180.0f / M_PI << " " << euler[0] * 180.0f / M_PI << "\t"
+							<< data.timestamp
+							<< std::endl;
+					}
+					else if (data_type == evo::imu::IMU_DATA_TYPE_POSITION_9_AXES)
+					{
+						// Convert Quaternion to Euler
+						Eigen::Quaternionf q(data.quaternion_9[3], data.quaternion_9[0], data.quaternion_9[1], data.quaternion_9[2]);
+						Eigen::Matrix3f rotationMatrix = q.matrix().cast<float>();
+						auto euler = rotationMatrix.eulerAngles(1, 0, 2);
+						std::cout << std::setprecision(4) << std::fixed << "9 roll/pitch/yaw/time:\t"
+							<< euler[2] * 180.0f / M_PI << " " << euler[1] * 180.0f / M_PI << " " << euler[0] * 180.0f / M_PI << "\t"
 							<< data.timestamp
 							<< std::endl;
 					}
