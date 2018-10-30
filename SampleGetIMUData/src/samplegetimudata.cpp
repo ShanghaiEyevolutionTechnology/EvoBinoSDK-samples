@@ -74,6 +74,9 @@ int main(int argc, char* argv[])
 
 		// Set IMU data type
 		camera.setIMUDataType(data_type);
+
+		// Set IMU retrieve mode
+		camera.setIMUDataRetrieveMode(evo::imu::IMU_DATA_RETRIEVE_MODE_NEWEST_IMAGE);
 		
 		// Start retrieve IMU data
 		res = camera.startRetrieveIMU();
