@@ -90,60 +90,61 @@ int main(int argc, char* argv[])
 
 			while (true)
 			{
-				// Grab image
-				//if (camera.grab() == evo::RESULT_CODE_OK)
-				//{
-				//	// Retrieve image
-				//	evo::Mat<unsigned char> left = camera.retrieveImage(evo::bino::SIDE_LEFT);
-				//}
-
-				// Retrieve IMU data
-				std::vector<evo::imu::IMUData> vector_data = camera.retrieveIMUData();
-
-				// Print newest result
-				if (vector_data.size() > 0)
+				// Grab image (if you use evo::imu::IMU_DATA_RETRIEVE_MODE_NEWEST_IMAGE, you must grab image)
+				if (camera.grab() == evo::RESULT_CODE_OK)
 				{
-					evo::imu::IMUData data = vector_data.at(vector_data.size() - 1);
+					// Retrieve image
+					evo::Mat<unsigned char> left = camera.retrieveImage(evo::bino::SIDE_LEFT);
+				
 
-					if (data_type == evo::imu::IMU_DATA_TYPE_RAW)
+					// Retrieve IMU data
+					std::vector<evo::imu::IMUData> vector_data = camera.retrieveIMUData();
+
+					// Print newest result
+					if (vector_data.size() > 0)
 					{
-						std::cout << std::setprecision(4) << std::fixed << "accel/gyro/magnet/time:\t"
-							<< data.accel[0] << " " << data.accel[1] << " " << data.accel[2] << "\t"
-							<< data.gyro[0] << " " << data.gyro[1] << " " << data.gyro[2] << "\t"
-							<< data.mag[0] << " " << data.mag[1] << " " << data.mag[2] << "\t"
-							<< data.timestamp
-							<< std::endl;
-					}
-					else if (data_type == evo::imu::IMU_DATA_TYPE_RAW_CALIBRATED)
-					{
-						std::cout << std::setprecision(4) << std::fixed << "calibrated accel/gyro/magnet/time:\t"
-							<< data.accel_calibrated[0] << " " << data.accel_calibrated[1] << " " << data.accel_calibrated[2] << "\t"
-							<< data.gyro_calibrated[0] << " " << data.gyro_calibrated[1] << " " << data.gyro_calibrated[2] << "\t"
-							<< data.mag_calibrated[0] << " " << data.mag_calibrated[1] << " " << data.mag_calibrated[2] << "\t"
-							<< data.timestamp
-							<< std::endl;
-					}
-					else if (data_type == evo::imu::IMU_DATA_TYPE_POSITION_6_AXES)
-					{
-						// Convert Quaternion to Euler
-						Eigen::Quaternionf q(data.quaternion_6[3], data.quaternion_6[0], data.quaternion_6[1], data.quaternion_6[2]);
-						Eigen::Matrix3f rotationMatrix = q.matrix().cast<float>();
-						auto euler = rotationMatrix.eulerAngles(1, 0, 2);
-						std::cout << std::setprecision(4) << std::fixed << "6 roll/pitch/yaw/time:\t"
-							<< euler[2] * 180.0f / M_PI << " " << euler[1] * 180.0f / M_PI << " " << euler[0] * 180.0f / M_PI << "\t"
-							<< data.timestamp
-							<< std::endl;
-					}
-					else if (data_type == evo::imu::IMU_DATA_TYPE_POSITION_9_AXES)
-					{
-						// Convert Quaternion to Euler
-						Eigen::Quaternionf q(data.quaternion_9[3], data.quaternion_9[0], data.quaternion_9[1], data.quaternion_9[2]);
-						Eigen::Matrix3f rotationMatrix = q.matrix().cast<float>();
-						auto euler = rotationMatrix.eulerAngles(1, 0, 2);
-						std::cout << std::setprecision(4) << std::fixed << "9 roll/pitch/yaw/time:\t"
-							<< euler[2] * 180.0f / M_PI << " " << euler[1] * 180.0f / M_PI << " " << euler[0] * 180.0f / M_PI << "\t"
-							<< data.timestamp
-							<< std::endl;
+						evo::imu::IMUData data = vector_data.at(vector_data.size() - 1);
+
+						if (data_type == evo::imu::IMU_DATA_TYPE_RAW)
+						{
+							std::cout << std::setprecision(4) << std::fixed << "accel/gyro/magnet/time:\t"
+								<< data.accel[0] << " " << data.accel[1] << " " << data.accel[2] << "\t"
+								<< data.gyro[0] << " " << data.gyro[1] << " " << data.gyro[2] << "\t"
+								<< data.mag[0] << " " << data.mag[1] << " " << data.mag[2] << "\t"
+								<< data.timestamp
+								<< std::endl;
+						}
+						else if (data_type == evo::imu::IMU_DATA_TYPE_RAW_CALIBRATED)
+						{
+							std::cout << std::setprecision(4) << std::fixed << "calibrated accel/gyro/magnet/time:\t"
+								<< data.accel_calibrated[0] << " " << data.accel_calibrated[1] << " " << data.accel_calibrated[2] << "\t"
+								<< data.gyro_calibrated[0] << " " << data.gyro_calibrated[1] << " " << data.gyro_calibrated[2] << "\t"
+								<< data.mag_calibrated[0] << " " << data.mag_calibrated[1] << " " << data.mag_calibrated[2] << "\t"
+								<< data.timestamp
+								<< std::endl;
+						}
+						else if (data_type == evo::imu::IMU_DATA_TYPE_POSITION_6_AXES)
+						{
+							// Convert Quaternion to Euler
+							Eigen::Quaternionf q(data.quaternion_6[3], data.quaternion_6[0], data.quaternion_6[1], data.quaternion_6[2]);
+							Eigen::Matrix3f rotationMatrix = q.matrix().cast<float>();
+							auto euler = rotationMatrix.eulerAngles(1, 0, 2);
+							std::cout << std::setprecision(4) << std::fixed << "6 roll/pitch/yaw/time:\t"
+								<< euler[2] * 180.0f / M_PI << " " << euler[1] * 180.0f / M_PI << " " << euler[0] * 180.0f / M_PI << "\t"
+								<< data.timestamp
+								<< std::endl;
+						}
+						else if (data_type == evo::imu::IMU_DATA_TYPE_POSITION_9_AXES)
+						{
+							// Convert Quaternion to Euler
+							Eigen::Quaternionf q(data.quaternion_9[3], data.quaternion_9[0], data.quaternion_9[1], data.quaternion_9[2]);
+							Eigen::Matrix3f rotationMatrix = q.matrix().cast<float>();
+							auto euler = rotationMatrix.eulerAngles(1, 0, 2);
+							std::cout << std::setprecision(4) << std::fixed << "9 roll/pitch/yaw/time:\t"
+								<< euler[2] * 180.0f / M_PI << " " << euler[1] * 180.0f / M_PI << " " << euler[0] * 180.0f / M_PI << "\t"
+								<< data.timestamp
+								<< std::endl;
+						}
 					}
 				}
 
