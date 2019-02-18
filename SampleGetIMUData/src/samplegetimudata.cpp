@@ -64,6 +64,10 @@ int main(int argc, char* argv[])
 
 	// Open camera
 	evo::RESULT_CODE res = camera.open(evo::bino::RESOLUTION_FPS_MODE_HD720_60);
+
+	// Since we only want to get IMU data, set not do recify to speed up the process, depth calculation will not be done too
+	evo::bino::GrabParameters grab_parameters;
+	grab_parameters.do_rectify = false;
 	
 	// If successed
 	if (res == evo::RESULT_CODE_OK)
@@ -91,7 +95,7 @@ int main(int argc, char* argv[])
 			while (true)
 			{
 				// Grab image (if you use evo::imu::IMU_DATA_RETRIEVE_MODE_NEWEST_IMAGE, you must grab image)
-				if (camera.grab() == evo::RESULT_CODE_OK)
+				if (camera.grab(grab_parameters) == evo::RESULT_CODE_OK)
 				{
 					// Retrieve image
 					evo::Mat<unsigned char> left = camera.retrieveImage(evo::bino::SIDE_LEFT);

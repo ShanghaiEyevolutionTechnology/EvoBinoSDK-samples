@@ -53,7 +53,7 @@ int main(int argc, char** argv)
 			if (camera.grab(grab_parameters) == evo::RESULT_CODE_OK)
 			{
 				//retrieve point cloud
-				evo_pointcloud = camera.retrieveDepth(evo::bino::DEPTH_TYPE_POINT_CLOUD_XYZBGRA, evo::MAT_TYPE_CPU);
+				evo_pointcloud = camera.retrieveDepth(evo::bino::DEPTH_TYPE_POINT_CLOUD_UNORGANIZED_XYZBGRA, evo::MAT_TYPE_CPU);
 
 				//set to PCL pointcloud
 				cloud->clear();

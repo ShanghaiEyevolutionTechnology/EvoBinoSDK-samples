@@ -1,7 +1,7 @@
 ﻿/**************************************************************************************************
 ** This sample demonstrates how to grab images and depth map with the EvoBinoSDK                 **
 ** Both images and depth map are displayed with OpenCV GUI                                       **
-** Most of the functions of the Bino SDK are linked with a key press event (using OpenCV)        **
+** Most of the functions of the SDK are linked with a key press event (using OpenCV)             **
 ***************************************************************************************************/
 
 /******   ======================

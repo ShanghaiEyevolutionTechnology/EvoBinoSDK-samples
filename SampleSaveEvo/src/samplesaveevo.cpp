@@ -1,6 +1,8 @@
 ﻿/**************************************************************************************************
 ** This sample simply shows how to save one .evo file with 100 frames.                           **
 ** The frames recorded in .evo file will be side-by-side.                                        **
+** If you are using camera with IMU, you can save the the IMU data in pair at the same time.     **
+** The IMU data will be saved in a .imu file with the same name of .evo file.                    **
 ***************************************************************************************************/
 
 #include <iostream>
@@ -21,7 +23,7 @@ int main(int argc, char* argv[])
 	// Create a camera object
 	evo::bino::StereoCamera camera;
 
-	//set not do recify to speed up the process, depth calculation will not be done too
+	// Set not do recify to speed up the process, depth calculation will not be done too
 	evo::bino::GrabParameters grab_parameters;
 	grab_parameters.do_rectify = false;
 

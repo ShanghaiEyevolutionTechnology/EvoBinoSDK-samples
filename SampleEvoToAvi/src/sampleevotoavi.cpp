@@ -39,11 +39,11 @@ int main(int argc, char* argv[])
 
 	//file name of the input evo file
 	std::string file_name;
-	//file name of the  sidy-by-side output avi file
+	//file name of the sidy-by-side output avi file
 	std::string file_name2;
-	//file name of the  left-view output avi file
+	//file name of the left-view output avi file
 	std::string file_name3;
-	//file name of the  right-view output avi file
+	//file name of the right-view output avi file
 	std::string file_name4;
 
 	//the evo mat used to read evo file
