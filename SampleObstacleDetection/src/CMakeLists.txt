@@ -20,7 +20,7 @@ else()
 	find_package(EvoBinoSDK REQUIRED)
 endif()
 	
-if (EvoBinoSDK_WITH_CUDA)
+if (EVO_BINO_SDK_WITH_CUDA)
 
 	find_package(OpenCV REQUIRED)
 	include_directories(${EvoBinoSDK_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
@@ -35,6 +35,6 @@ if (EvoBinoSDK_WITH_CUDA)
 		add_executable(${TARGET_NAME} ${DIR_HEADERS} ${DIR_CPP_SRCS})
 	endif()
 
-	target_link_libraries(${TARGET_NAME} ${EvoBinoSDK_LIBRARIES} ${OpenCV_LIBS}) 
+	target_link_libraries(${TARGET_NAME} PRIVATE ${EvoBinoSDK_LIBRARIES} ${OpenCV_LIBS}) 
 
-endif (EvoBinoSDK_WITH_CUDA)
+endif (EVO_BINO_SDK_WITH_CUDA)

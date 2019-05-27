@@ -95,11 +95,11 @@ int main(int argc, char* argv[])
 			while (true)
 			{
 				// Grab image (if you use evo::imu::IMU_DATA_RETRIEVE_MODE_NEWEST_IMAGE, you must grab image)
-				if (camera.grab(grab_parameters) == evo::RESULT_CODE_OK)
+				res = camera.grab(grab_parameters);
+				if (res == evo::RESULT_CODE_OK)
 				{
 					// Retrieve image
-					evo::Mat<unsigned char> left = camera.retrieveImage(evo::bino::SIDE_LEFT);
-				
+					evo::Mat<unsigned char> left = camera.retrieveImage(evo::bino::SIDE_LEFT);				
 
 					// Retrieve IMU data
 					std::vector<evo::imu::IMUData> vector_data = camera.retrieveIMUData();
@@ -151,6 +151,7 @@ int main(int argc, char* argv[])
 						}
 					}
 				}
+				std::this_thread::sleep_for(std::chrono::microseconds(10000));
 
 				now = std::chrono::high_resolution_clock::now();
 				std::chrono::duration<double> elapsed = now - start;

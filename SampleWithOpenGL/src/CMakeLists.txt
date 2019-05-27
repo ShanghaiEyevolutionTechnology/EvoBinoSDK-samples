@@ -20,7 +20,7 @@ else()
 	find_package(EvoBinoSDK REQUIRED)
 endif()
 	
-if (EvoBinoSDK_WITH_CUDA)
+if (EVO_BINO_SDK_WITH_CUDA)
 
 	find_package(CUDA REQUIRED)
 	find_package(GLUT REQUIRED)
@@ -41,6 +41,6 @@ if (EvoBinoSDK_WITH_CUDA)
 		add_executable(${TARGET_NAME} ${DIR_HEADERS} ${DIR_CPP_SRCS})
 	endif()
 
-	target_link_libraries(${TARGET_NAME} ${EvoBinoSDK_LIBRARIES} ${CUDA_LIBRARIES} ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES}) 
+	target_link_libraries(${TARGET_NAME} PRIVATE ${EvoBinoSDK_LIBRARIES} ${CUDA_LIBRARIES} ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES}) 
 
-endif (EvoBinoSDK_WITH_CUDA)
+endif (EVO_BINO_SDK_WITH_CUDA)

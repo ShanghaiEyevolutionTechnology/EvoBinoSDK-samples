@@ -53,9 +53,9 @@ int main(int argc, char* argv[])
 			// Loop until we record frames of target number, or error is occured
 			while (count < target_frame_number)
 			{
-				// Get frames, do not do CPU rectify, it may be slow on some device
 				// Check the grab result, if result is evo::RESULT_CODE_NOT_A_NEW_FRAME, it means new frame is not come, just wait and grab again
-				if (camera.grab(grab_parameters) == evo::RESULT_CODE_OK)
+				res = camera.grab(grab_parameters);
+				if (res == evo::RESULT_CODE_OK)
 				{
 					// You can retrieve image for displaying here, or just skip retrieving
 					//evo::Mat<unsigned char> sbs = camera.retrieveImage(evo::bino::SIDE_SBS);
