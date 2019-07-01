@@ -226,7 +226,7 @@ int main(int argc, char* argv[])
 					cv_result = evo::evoMat2cvMat(evo_result);
 					if (cv_result.channels() == 4)
 					{
-						cv::cvtColor(cv_result, cv_result_bgr, CV_RGBA2BGR);//need to swap R and B channel for OpenCV display
+						cv::cvtColor(cv_result, cv_result_bgr, cv::COLOR_RGBA2BGR);//need to swap R and B channel for OpenCV display
 					}
 					else//ground map is 1 channel
 					{

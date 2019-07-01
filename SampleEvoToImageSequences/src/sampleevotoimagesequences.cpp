@@ -1,14 +1,14 @@
 ﻿/**************************************************************************************************
-** This sample simply shows how to save image sequences for .evo file.                           **
+** This sample simply shows how to save image sequences from .evo file.                          **
 ** Image sequences file named with frame number will be saved.                                   **
 ***************************************************************************************************/
 
-//header for the stereocamera
+//EvoBinoSDK header
 #include "evo_stereocamera.h"
-//used to transform evo mat to OpenCV mat
-#include "evo_matconverter.h"
-//use OpenCV to save image sequences file
-#include <opencv2/core/core.hpp>
+#include "evo_matconverter.h"//converter between evo mat and OpenCV mat
+
+//OpenCV header
+#include <opencv2/opencv.hpp>
 
 //the bool value is used to work with the hotkey for breaking out
 bool isRunning = true;
@@ -16,12 +16,9 @@ bool isRunning = true;
 //press "ESC" or "q" to quit
 void handleKey(char key)
 {
-	int value = -1;
 	switch (key)
 	{
 	case 27:
-		isRunning = false;
-		break;
 	case 'q':
 		isRunning = false;
 		break;
@@ -44,7 +41,7 @@ int main(int argc, char* argv[])
 	//the evo mat used to read evo file
 	evo::Mat<unsigned char> image;
 
-	//the cv mat used to save image sequences file
+	//the OpenCV mat used to save image sequences file
 	cv::Mat cvImage;
 
 	//save the rectified image or raw image
@@ -115,7 +112,7 @@ int main(int argc, char* argv[])
 				//retrieve image from evo file
 				image = camera.retrieveImage(evo::bino::SIDE_SBS);
 
-				//transform evo mat to open cv mat
+				//transform evo mat to OpenCV mat
 				cvImage = evo::evoMat2cvMat(image);
 
 				//get current frame index
@@ -129,10 +126,9 @@ int main(int argc, char* argv[])
 
 				//show current frame
 				cv::imshow("image", cvImage);
-
-				//handle key event
-				handleKey((char)cv::waitKey(10));
 			}
+			//handle key event
+			handleKey((char)cv::waitKey(10));
 		}
 
 		cv::waitKey(100);

@@ -1,9 +1,8 @@
-﻿/**************************************************************************************************
-** This sample demonstrates how to grab images and disparity map with the EvoBinoSDK             **
-** The GPU buffer is ingested directly into OpenGL texture for avoiding GPU->CPU readback time   **
-** For the image, this sample shows how to show a gray image					                 **
-** For the depth, this sample shows how to show a RGBA image                                     **
-***************************************************************************************************/
+﻿/***************************************************************************************************
+** This sample demonstrates how to grab images and disparity map with the EvoBinoSDK without CUDA **
+** For the image, this sample shows how to show a gray image					                  **
+** For the depth, this sample shows how to show a RGBA image                                      **
+****************************************************************************************************/
 
 /******   ======================
 *****   * Keyboard shortcuts *
@@ -23,29 +22,23 @@
 #include "GL/freeglut_std.h"
 #include "GL/freeglut_ext.h"
 
-//Cuda header
-#include <cuda.h>
-#include <cuda_runtime.h>
-#include <cuda_gl_interop.h>
-
 //EvoBinoSDK header
-#include "evo_depthcamera.h"
+#include "evo_stereocamera.h"
 
 //high resolution clock
 #include <chrono>
 
 #include <sstream>
 
-evo::bino::DepthCamera camera;
+evo::bino::StereoCamera camera;
 evo::bino::GrabParameters grab_parameters;
 bool running = false;
 bool is_gray = false;
 bool fullscreen = false;
-evo::Mat<unsigned char> evo_image_gpu, evo_depth_gpu;
+evo::Mat<unsigned char> evo_image_cpu, evo_depth_cpu;
 int w, h;//image width/height
 //declare some ressources (GL texture ID, GL shader ID...)
 GLuint imageTex, depthTex;
-cudaGraphicsResource *pcuImageRes, *pcuDepthRes;
 std::chrono::time_point<std::chrono::high_resolution_clock> now, last;
 bool show_fps = false;
 
@@ -96,22 +89,8 @@ void draw()
 	if (res == evo::RESULT_CODE_OK)
 	{
 		//Retrieve image and normalized depth
-		evo_image_gpu = camera.retrieveImage(evo::bino::SIDE_LEFT, evo::MAT_TYPE_GPU);//gray 1 channel
-		evo_depth_gpu = camera.retrieveNormalizedDepth(evo::bino::DEPTH_TYPE_DISTANCE_Z_COLOR, evo::MAT_TYPE_GPU, 255, 0);//RGBA 4 channels
-
-		//Map GPU Ressource for Image
-		cudaArray_t image_cuda_array;
-		cudaGraphicsMapResources(1, &pcuImageRes, 0);
-		cudaGraphicsSubResourceGetMappedArray(&image_cuda_array, pcuImageRes, 0, 0);
-		cudaMemcpyToArray(image_cuda_array, 0, 0, evo_image_gpu.data, sizeof(unsigned char) * w * h, cudaMemcpyDeviceToDevice);
-		cudaGraphicsUnmapResources(1, &pcuImageRes, 0);
-
-		//Map GPU Ressource for Depth
-		cudaArray_t depth_cuda_array;
-		cudaGraphicsMapResources(1, &pcuDepthRes, 0);
-		cudaGraphicsSubResourceGetMappedArray(&depth_cuda_array, pcuDepthRes, 0, 0);
-		cudaMemcpyToArray(depth_cuda_array, 0, 0, evo_depth_gpu.data, sizeof(unsigned char) * w * h * 4, cudaMemcpyDeviceToDevice);
-		cudaGraphicsUnmapResources(1, &pcuDepthRes, 0);
+		evo_image_cpu = camera.retrieveImage(evo::bino::SIDE_LEFT);//gray 1 channel
+		evo_depth_cpu = camera.retrieveNormalizedDepth(evo::bino::DEPTH_TYPE_DISTANCE_Z_COLOR, 255, 0);//RGBA 4 channels
 
 		//OpenGL Part
 		glDrawBuffer(GL_BACK); //write to both BACK_LEFT & BACK_RIGHT
@@ -122,6 +101,7 @@ void draw()
 		//Draw Image Texture in Left Part of Side by Side
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, imageTex);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, w, h, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, evo_image_cpu.data);
 		glBegin(GL_QUADS);
 		glColor3f(1.0f, 1.0f, 1.0f);
 		glTexCoord2f(0.0, 1.0);
@@ -139,6 +119,7 @@ void draw()
 		//Draw Depth Texture in Right Part of Side by Side
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, depthTex);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, evo_depth_cpu.data);
 		glBegin(GL_QUADS);
 		glColor3f(1.0f, 1.0f, 1.0f);
 		glTexCoord2f(0.0, 1.0);
@@ -176,11 +157,9 @@ void draw()
 	if (!running) {
 		glutLeaveMainLoop();
 		glutDestroyWindow(1);
-		camera.close();	
-		cudaError_t err = cudaGraphicsUnregisterResource(pcuImageRes);
+		camera.close();
 		glBindTexture(GL_TEXTURE_2D, imageTex);
 		glDeleteTextures(1, &imageTex);
-		err = cudaGraphicsUnregisterResource(pcuDepthRes);
 		glBindTexture(GL_TEXTURE_2D, depthTex);
 		glDeleteTextures(1, &depthTex);
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -214,11 +193,9 @@ int main(int argc, char* argv[])
 		glutInitWindowSize(w, h / 2);
 
 		//Create Window
-		glutCreateWindow("Eyevolution OpenGL Sample");
+		glutCreateWindow("Eyevolution OpenGL Sample (No CUDA)");
 
 		glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
-
-		cudaError_t err1, err2;
 
 		glEnable(GL_TEXTURE_2D);
 
@@ -229,7 +206,6 @@ int main(int argc, char* argv[])
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, w, h, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, NULL);
 		glBindTexture(GL_TEXTURE_2D, 0);
-		err1 = cudaGraphicsGLRegisterImage(&pcuImageRes, imageTex, GL_TEXTURE_2D, cudaGraphicsMapFlagsNone);
 
 		//Create and Register a OpenGL texture for Depth (RGBA - 4 Channels)
 		glGenTextures(1, &depthTex);
@@ -238,9 +214,6 @@ int main(int argc, char* argv[])
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 		glBindTexture(GL_TEXTURE_2D, 0);
-		err2 = cudaGraphicsGLRegisterImage(&pcuDepthRes, depthTex, GL_TEXTURE_2D, cudaGraphicsMapFlagsNone);
-
-		if (err1 != 0 || err2 != 0) return -1;
 
 		glutKeyboardFunc(handleKeypress);
 

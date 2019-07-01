@@ -11,29 +11,29 @@ Documentation page: http://leadsense.ilooktech.com/sdk/docs
 
 # Contents
 
-The EvoBinoSDK tutorials and samples that demonstrate the API features and code.
+The tutorials and samples that demonstrate the API features and code.
 
 SampleEvoToAvi - This sample shows how to convert .evo file to .avi file.
 
 SampleEvoToImageSequences - This sample shows how to convert .evo file to image sequence files.
 
-SampleGetIMUData - This sample shows how to get all types of IMU data by EvoBino SDK.
+SampleGetIMUData - This sample shows how to get all types of IMU data.
 
-SampleHelloWorld - A basic tutorials that explains how to build an application with the EvoBino SDK on Windows and Linux platforms.
+SampleHelloWorld - A basic tutorials that explains how to build an application with SDK.
 
-SampleObstacleDetection - This sample shows how to use obstacle detection functions provided by EvoBino SDK.
+SampleObstacleDetection - This sample shows how to use obstacle detection functions.
 
-SampleSaveEvo - This sample shows how to save evo file by EvoBino SDK.
+SampleSaveEvo - This sample shows how to save evo file.
 
-SampleWithCUDA - This sample shows how to get depth data by EvoBino SDK, and do calcution with the data by CUDA directly.
+SampleWithCUDA - This sample shows how to get depth data, then do calculation with the data by CUDA directly.
 
-SampleWithOpenCV - This sample shows how to capture image and depth by EvoBino SDK, then convert to OpenCV Mat and display them.
+SampleWithOpenCV / SampleWithOpenCVNoCUDA - This sample shows how to capture image and depth, then convert to OpenCV Mat and display them.
 
-SampleWithOpenGL - This sample shows how to capture image and depth by EvoBino SDK, then display them by OpenGL.
+SampleWithOpenGL / SampleWithOpenGLNoCUDA - This sample shows how to capture image and depth, then display them by OpenGL.
 
-SampleWithPCL - This sample shows how to get point cloud data by EvoBino SDK, and show them by PCL.
+SampleWithPCL / SampleWithPCLNoCUDA - This sample shows how to get point cloud data, then show them by PCL.
 
-SampleWithQt - This sample shows how to use EvoBino SDK with QT5.
+SampleWithQt - This sample shows how to use SDK with QT5.
 
 <br/>
 

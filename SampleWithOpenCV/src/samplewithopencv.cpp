@@ -49,14 +49,14 @@ static void onMouse(int event, int x, int y, int flags, void *param)
 {
 	switch (event)
 	{
-	case CV_EVENT_LBUTTONDOWN:
+	case cv::EVENT_LBUTTONDOWN:
 		break;
-	case CV_EVENT_LBUTTONUP:
+	case cv::EVENT_LBUTTONUP:
 		mouseX = x;
 		mouseY = y;
 		std::cout << "x: " << x << ", y: " << y << std::endl;
 		break;
-	case CV_EVENT_MOUSEMOVE:
+	case cv::EVENT_MOUSEMOVE:
 		break;
 	}
 }
@@ -64,7 +64,6 @@ static void onMouse(int event, int x, int y, int flags, void *param)
 //function for key press event
 void handleKey(char key)
 {
-	int value = -1;
 	float cur;
 	switch (key)
 	{
@@ -170,8 +169,11 @@ int main(int argc, char* argv[])
 	//set default point (center of the image) for showing distance
 	mouseX = camera.getImageSizeFPS().width / 2;
 	mouseY = camera.getImageSizeFPS().height / 2;
-	//grab parameters
-	evo::bino::GrabParameters grab_parameters;
+	//grab parameter
+	evo::bino::GrabParameters grabPara;
+	grabPara.do_rectify = true;
+	grabPara.calc_disparity = true;
+	grabPara.calc_distance = true;
 
 	if (res == evo::RESULT_CODE_OK)//open camera successed
 	{
@@ -193,7 +195,7 @@ int main(int argc, char* argv[])
 		while (running)
 		{
 			// Get frames and launch the computation
-			if (camera.grab(grab_parameters) == evo::RESULT_CODE_OK)
+			if (camera.grab(grabPara) == evo::RESULT_CODE_OK)
 			{
 				//retrieve image
 				//retrieveView() returns a RGBA Mat, so when using OpenCV to show it, we need to swap R and B channel
@@ -239,12 +241,12 @@ int main(int argc, char* argv[])
 				
 				//Mat convert
 				cv_image = evo::evoMat2cvMat(evo_image);
-				cv::cvtColor(cv_image, cv_image_bgr, CV_RGBA2BGR);//need to swap R and B channel for OpenCV display
+				cv::cvtColor(cv_image, cv_image_bgr, cv::COLOR_RGBA2BGR);//need to swap R and B channel for OpenCV display
 
 				cv_depth = evo::evoMat2cvMat(evo_depth);
 				if (depthId == 2)//distance z color need to swap R and B channel for OpenCV display
 				{
-					cv::cvtColor(cv_depth, cv_depth_bgr, CV_RGBA2BGR);//rgba -> bgr
+					cv::cvtColor(cv_depth, cv_depth_bgr, cv::COLOR_RGBA2BGR);//rgba -> bgr
 				}
 				else
 				{

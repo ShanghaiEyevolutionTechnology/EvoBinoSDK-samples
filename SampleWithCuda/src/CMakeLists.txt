@@ -13,6 +13,15 @@ else()
 	# external build
 	project( ${TARGET_NAME} )
 	
+	if (CMAKE_VERSION VERSION_LESS "3.9.0")
+		# Set only because there are old target_link_libraries() statements in the
+		# FindCUDA.cmake file that comes with CMake that error out if the new behavior
+		# is used.  In newer versions of CMake we can instead set CUDA_LINK_LIBRARIES_KEYWORD which fixes this issue.
+		cmake_policy(SET CMP0023 OLD)
+	else()
+		set(CUDA_LINK_LIBRARIES_KEYWORD PRIVATE)
+	endif()
+	
 	set(CMAKE_CXX_STANDARD 11) #C++ 11...
 	set(CMAKE_CXX_STANDARD_REQUIRED ON) #...is required...
 	set(CMAKE_CXX_EXTENSIONS OFF) #..without compiler extensions like gnu++11

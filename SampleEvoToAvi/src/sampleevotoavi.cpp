@@ -1,14 +1,14 @@
 ﻿/**************************************************************************************************
 ** This sample simply shows how to transform one .evo file to .avi file.                         **
-** Left view, right view and side-by-side avi file will be generated.                            **
+** Left, right and side-by-side avi file will be generated.                                      **
 ***************************************************************************************************/
 
-//header for the stereocamera
+//EvoBinoSDK header
 #include "evo_stereocamera.h"
-//used to transform evo mat to OpenCV mat
-#include "evo_matconverter.h"
-//use OpenCV to save .avi file
-#include <opencv2/core/core.hpp>
+#include "evo_matconverter.h"//converter between evo mat and OpenCV mat
+
+//OpenCV header
+#include <opencv2/opencv.hpp>
 
 //the bool value is used to work with the hotkey for breaking out
 bool isRunning = true;
@@ -16,12 +16,9 @@ bool isRunning = true;
 //press "ESC" or "q" to quit
 void handleKey(char key)
 {
-	int value = -1;
 	switch (key)
 	{
 	case 27:
-		isRunning = false;
-		break;
 	case 'q':
 		isRunning = false;
 		break;
@@ -51,7 +48,7 @@ int main(int argc, char* argv[])
 	evo::Mat<unsigned char> imageL;
 	evo::Mat<unsigned char> imageR;
 
-	//the cv mat used to save avi file
+	//the OpenCV mat used to save avi file
 	cv::Mat cvImage;
 	cv::Mat cvImageL;
 	cv::Mat cvImageR;
@@ -115,13 +112,20 @@ int main(int argc, char* argv[])
 	grab_parameters.calc_disparity = false;
 
 	//open the evo file
-	if (camera.open(file_name.c_str()) == evo::RESULT_CODE_OK)
+	evo::RESULT_CODE res = camera.open(file_name.c_str());
+	if (res == evo::RESULT_CODE_OK)
 	{
 		//initial the avi file writer
-		writer.open(file_name2, CV_FOURCC('M', 'P', '4', '2'), (double)camera.getImageSizeFPS().fps, cvSize(camera.getImageSizeFPS().width * 2, camera.getImageSizeFPS().height), false);
-		writerL.open(file_name3, CV_FOURCC('M', 'P', '4', '2'), (double)camera.getImageSizeFPS().fps, cvSize(camera.getImageSizeFPS().width, camera.getImageSizeFPS().height), false);
-		writerR.open(file_name4, CV_FOURCC('M', 'P', '4', '2'), (double)camera.getImageSizeFPS().fps, cvSize(camera.getImageSizeFPS().width, camera.getImageSizeFPS().height), false);
-
+		evo::bino::Resolution_FPS r_f = camera.getImageSizeFPS();
+		bool is_color = true;
+		if (camera.getImageChannel() == 1)
+		{
+			is_color = false;
+		}
+		writer.open(file_name2, cv::VideoWriter::fourcc('M', 'P', '4', '2'), r_f.fps, cv::Size(r_f.width * 2, r_f.height), is_color);
+		writerL.open(file_name3, cv::VideoWriter::fourcc('M', 'P', '4', '2'), r_f.fps, cv::Size(r_f.width, r_f.height), is_color);
+		writerR.open(file_name4, cv::VideoWriter::fourcc('M', 'P', '4', '2'), r_f.fps, cv::Size(r_f.width, r_f.height), is_color);
+		
 		if (!writer.isOpened() || !writerL.isOpened() || !writerR.isOpened())
 		{
 			std::cout << "create avi file failed" << std::endl;
@@ -174,7 +178,7 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		std::cout << "camera open failed" << std::endl;
+		std::cout << "camera open failed: " << evo::result_code2str(res) << std::endl;
 	}
 
 	return 0;

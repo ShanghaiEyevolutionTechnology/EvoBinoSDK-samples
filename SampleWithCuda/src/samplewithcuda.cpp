@@ -25,11 +25,11 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 
-//opencv header
+//OpenCV header
 #include <opencv2/opencv.hpp>
 
 //EvoBinoSDK header
-#include "evo_depthcamera.h"//depth camera
+#include "evo_depthcamera.h"
 #include "evo_matconverter.h"//converter between evo mat and OpenCV mat
 
 //Cuda functions
@@ -45,7 +45,6 @@ float max_z_distance = 4000.0f; //mm
 //function for key press event
 void handleKey(char key)
 {
-	int value = -1;
 	switch (key)
 	{
 	case 27://exit
@@ -73,12 +72,15 @@ int main(int argc, char* argv[])
 	evo::Mat<unsigned char> evo_left_gpu, evo_checkerboard_gpu, evo_result_gpu, evo_result_cpu;
 	evo::Mat<float> evo_z_gpu;
 	unsigned int width, height;
-	cv::Mat cv_result, cv_result_new;
+	cv::Mat cv_result;
 	//open camera
 	evo::RESULT_CODE res = camera.open(evo::bino::RESOLUTION_FPS_MODE_HD720_60);
 	std::cout << "depth camera open: " << result_code2str(res) << std::endl;
 	//grab parameter
 	evo::bino::GrabParameters grab_parameters;
+	grab_parameters.do_rectify = true;
+	grab_parameters.calc_disparity = true;
+	grab_parameters.calc_distance = true;
 	//show image size
 	width = camera.getImageSizeFPS().width;
 	height = camera.getImageSizeFPS().height;
@@ -104,8 +106,9 @@ int main(int argc, char* argv[])
 		//main loop
 		while (running)
 		{
-			// Get frames and launch the computation
-			if (camera.grab(grab_parameters) == evo::RESULT_CODE_OK)
+			//get frames and launch the computation
+			res = camera.grab(grab_parameters);
+			if (res == evo::RESULT_CODE_OK)
 			{
 				//retrieve image
 				evo_left_gpu = camera.retrieveImage(evo::bino::SIDE_LEFT, evo::MAT_TYPE_GPU);

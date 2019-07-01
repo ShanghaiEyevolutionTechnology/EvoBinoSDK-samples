@@ -1,5 +1,5 @@
 ﻿/**************************************************************************************************
-** This sample demonstrates how to use EvoBinoSDK with PCL                                       **
+** This sample demonstrates how to use EvoBinoSDK with PCL without CUDA                          **
 ***************************************************************************************************/
 
 
@@ -13,7 +13,7 @@
 #include <pcl/visualization/cloud_viewer.h>
 
 //SDK header
-#include "evo_depthcamera.h"
+#include "evo_stereocamera.h"
 
 //Define Point Type
 typedef pcl::PointXYZRGBA PointT;
@@ -22,7 +22,7 @@ typedef pcl::PointCloud<PointT> PointCloud;
 int main(int argc, char** argv)
 {
 	//define camera
-	evo::bino::DepthCamera camera;
+	evo::bino::StereoCamera camera;
 	//open camera
 	evo::bino::RESOLUTION_FPS_MODE res_mode = evo::bino::RESOLUTION_FPS_MODE_HD720_60;
 	evo::RESULT_CODE res = camera.open(res_mode);
@@ -55,7 +55,7 @@ int main(int argc, char** argv)
 			if (camera.grab(grab_parameters) == evo::RESULT_CODE_OK)
 			{
 				//retrieve point cloud
-				evo_pointcloud = camera.retrieveDepth(evo::bino::DEPTH_TYPE_POINT_CLOUD_UNORGANIZED_XYZBGRA, evo::MAT_TYPE_CPU);
+				evo_pointcloud = camera.retrieveDepth(evo::bino::DEPTH_TYPE_POINT_CLOUD_UNORGANIZED_XYZBGRA);
 
 				//set to PCL pointcloud
 				cloud->clear();
