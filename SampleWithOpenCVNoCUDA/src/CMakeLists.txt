@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
 
-set(TARGET_NAME SampleWithOpenCVNoCuda)
+set(TARGET_NAME SampleWithOpenCVNoCUDA)
 
 if(DEFINED PROJECT_NAME)
 	set(insideSDK true)
