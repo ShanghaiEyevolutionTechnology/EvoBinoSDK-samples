@@ -1,4 +1,4 @@
-﻿/***************************************************************************************************************
+﻿﻿/***************************************************************************************************************
 ** This sample simply shows how to get IMU data for 10 seconds.                                               **
 ** There are 4 evo::imu::IMU_DATA_TYPE:                                                                       **
 **        evo::imu::IMU_DATA_TYPE_RAW, evo::imu::IMU_DATA_TYPE_RAW_CALIBRATED,                                **
@@ -111,20 +111,23 @@ int main(int argc, char* argv[])
 
 						if (data_type == evo::imu::IMU_DATA_TYPE_RAW)
 						{
-							std::cout << std::setprecision(4) << std::fixed << "accel/gyro/magnet/time:\t"
+							std::cout << "raw time/accel/gyro/magnet:\t" 
+								<< data.timestamp << "\t"
+								<< std::setprecision(4) << std::fixed
 								<< data.accel[0] << " " << data.accel[1] << " " << data.accel[2] << "\t"
 								<< data.gyro[0] << " " << data.gyro[1] << " " << data.gyro[2] << "\t"
-								<< data.mag[0] << " " << data.mag[1] << " " << data.mag[2] << "\t"
-								<< data.timestamp
+								<< data.mag[0] << " " << data.mag[1] << " " << data.mag[2]
+								
 								<< std::endl;
 						}
 						else if (data_type == evo::imu::IMU_DATA_TYPE_RAW_CALIBRATED)
 						{
-							std::cout << std::setprecision(4) << std::fixed << "calibrated accel/gyro/magnet/time:\t"
+							std::cout << "calibrated time/accel/gyro/magnet:\t" 
+								<< data.timestamp << "\t"
+								<< std::setprecision(4) << std::fixed 
 								<< data.accel_calibrated[0] << " " << data.accel_calibrated[1] << " " << data.accel_calibrated[2] << "\t"
 								<< data.gyro_calibrated[0] << " " << data.gyro_calibrated[1] << " " << data.gyro_calibrated[2] << "\t"
-								<< data.mag_calibrated[0] << " " << data.mag_calibrated[1] << " " << data.mag_calibrated[2] << "\t"
-								<< data.timestamp
+								<< data.mag_calibrated[0] << " " << data.mag_calibrated[1] << " " << data.mag_calibrated[2]
 								<< std::endl;
 						}
 						else if (data_type == evo::imu::IMU_DATA_TYPE_POSITION_6_AXES)
@@ -133,9 +136,10 @@ int main(int argc, char* argv[])
 							Eigen::Quaternionf q(data.quaternion_6[3], data.quaternion_6[0], data.quaternion_6[1], data.quaternion_6[2]);
 							Eigen::Matrix3f rotationMatrix = q.matrix().cast<float>();
 							auto euler = rotationMatrix.eulerAngles(1, 0, 2);
-							std::cout << std::setprecision(4) << std::fixed << "6 roll/pitch/yaw/time:\t"
-								<< euler[2] * 180.0f / M_PI << " " << euler[1] * 180.0f / M_PI << " " << euler[0] * 180.0f / M_PI << "\t"
-								<< data.timestamp
+							std::cout << "6 axes time/roll/pitch/yaw:\t" 
+								<< data.timestamp << "\t"
+								<< std::setprecision(4) << std::fixed
+								<< euler[2] * 180.0f / M_PI << " " << euler[1] * 180.0f / M_PI << " " << euler[0] * 180.0f / M_PI
 								<< std::endl;
 						}
 						else if (data_type == evo::imu::IMU_DATA_TYPE_POSITION_9_AXES)
@@ -144,9 +148,10 @@ int main(int argc, char* argv[])
 							Eigen::Quaternionf q(data.quaternion_9[3], data.quaternion_9[0], data.quaternion_9[1], data.quaternion_9[2]);
 							Eigen::Matrix3f rotationMatrix = q.matrix().cast<float>();
 							auto euler = rotationMatrix.eulerAngles(1, 0, 2);
-							std::cout << std::setprecision(4) << std::fixed << "9 roll/pitch/yaw/time:\t"
-								<< euler[2] * 180.0f / M_PI << " " << euler[1] * 180.0f / M_PI << " " << euler[0] * 180.0f / M_PI << "\t"
-								<< data.timestamp
+							std::cout << "9 axes time/roll/pitch/yaw:\t" 
+								<< data.timestamp << "\t"
+								<< std::setprecision(4) << std::fixed
+								<< euler[2] * 180.0f / M_PI << " " << euler[1] * 180.0f / M_PI << " " << euler[0] * 180.0f / M_PI
 								<< std::endl;
 						}
 					}
